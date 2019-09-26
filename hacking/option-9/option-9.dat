@@ -1,0 +1,8 @@
+((:kind :player-simple-shot)
+  (:class simple-shot)
+  (:initargs
+    :radius .04
+    :primitives ((:line-loop ((0 1) (1 1 1))
+                             ((1 0) (1 1 1))
+			     ((0 -1) (1 1 1))
+			     ((-1 0) (1 1 1))))))

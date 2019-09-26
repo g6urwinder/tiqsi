@@ -1,0 +1,45 @@
+(ql:quickload :sdl2)
+(ql:quickload :cl-opengl)
+
+(defun main ()
+  "The entry point of our game."
+  (sdl2:with-init (:everything)
+    (debug-log "Using SDL Library version: ~D ~D ~D~%"
+	       sdl2-ffi:+sdl-major-version+
+	       sdl2-ffi:+sdl-minor-version+
+	       sdl2-ffi:+sdl-patchlevel+)
+
+    (sdl2:with-window (win :flags '(:shown :opengl))
+      (sdl2:with-gl-context (gl-context win)
+	(setup-gl win gl-context)
+	(main-loop win #'render)))))
+
+(defun debug-log (msg &rest args)
+  (apply #'format t msg args)
+  (finish-output))
+(defun setup-gl (win gl-context)
+  (debug-log "Setting up window/gl~%")
+  (sdl2:gl-make-current win gl-context)
+  (gl:viewport 0 0 800 600)
+  (gl:matrix-mode :projection)
+  (gl:ortho -2 2 -2 2 -2 2)
+  (gl:matrix-mode :modelview)
+  (gl:load-identity)
+  (gl:clear-color 0.0 0.0 0.0 1.0))
+
+(defun render ()
+  (gl:clear :color-buffer)
+  (gl:begin :triangles)
+  (gl:color 1.0 0.0 0.0)
+  (gl:vertex 0.0 1.0)
+  (gl:vertex -1.0 -1.0)
+  (gl:vertex 1.0 -1.0)
+  (gl:end)
+  (gl:flush))
+(defun main-loop (win render-fn)
+  (sdl2:with-event-loop (:method :poll)
+    (:idle ()
+	   (funcall render-fn)
+	   (sdl2:gl-swap-window win))
+    (:quit () t)))
+(main)
